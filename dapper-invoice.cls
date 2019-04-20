@@ -56,7 +56,7 @@
 
 % Formatting numbers
 \RequirePackage{siunitx}
-\sisetup{round-integer-to-decimal, group-separator={,}}
+\sisetup{round-integer-to-decimal, locale = DE, round-precision = 2, group-minimum-digits=3, round-mode=places, group-separator = {.}}
 
 \RequirePackage{fontspec}
 
@@ -77,9 +77,9 @@
         bookmarksopen  = false,
         bookmarksdepth = 2,% to show sections and subsections
         pdfauthor      = {#1},
-        pdftitle       = {#2 --- Invoice \##3 for #4},
-        pdfsubject     = {Invoice \##3},
-        pdfkeywords    = {invoice, #2, #4}
+        pdftitle       = {#2 --- Rechnung \##3 für #4},
+        pdfsubject     = {Rechnung \##3},
+        pdfkeywords    = {Rechnung, #2, #4}
     }
 }
 
@@ -92,8 +92,8 @@
     \begin{minipage}[t]{.6\linewidth} {\headerStyle #1} \end{minipage}
     \hfill
     \begin{tabular}[t]{@{} c @{}}
-        {\headerStyle \invoiceSpacing{INVOICE} \##2} \\
-        {\color{subduedColor} \today}
+        {\headerStyle \invoiceSpacing{RECHNUNG}} \\
+        {\color{subduedColor} Nr. #2 » \today}
     \end{tabular}
 
     \addvspace{8ex}
@@ -133,40 +133,14 @@
     \setcounter{colskipcount}{5}
     \setlength\LTleft{0pt}
     \setlength\LTright{0pt}
-    \begin{longtable}{c @{\hspace{1.5em}} p{.6\textwidth} r @{} l r r}
+    \begin{longtable}{c @{\hspace{1.5em}} p{.5\textwidth} r @{} l r r}
     \hline
     \noalign{\smallskip}
-    {\itemizationHeaderStyle Date} &
-    {\itemizationHeaderStyle Description} &
-    \multicolumn{2}{l}{\itemizationHeaderStyle Hours} &
-    {\itemizationHeaderStyle Rate} &
-    {\itemizationHeaderStyle Amount}
-    \\
-    \noalign{\smallskip}
-    \hline
-    \noalign{\bigskip}
-    \endhead
-    \noalign{\bigskip}
-    \hline
-    \endfoot
-    \endlastfoot
-}{
-    \end{longtable}
-}
-
-\newenvironment{hoursItemizationWithProject}{
-    \setcounter{colskipcount}{6}
-    \setlength\LTleft{0pt}
-    \setlength\LTright{0pt}
-    \begin{longtable}{c c @{\hspace{1.5em}} p{.5\textwidth} r @{} l r r}
-    \hline
-    \noalign{\smallskip}
-    {\itemizationHeaderStyle Date} &
-    {\itemizationHeaderStyle Project} &
-    {\itemizationHeaderStyle Description} &
-    \multicolumn{2}{l}{\itemizationHeaderStyle Hours} &
-    {\itemizationHeaderStyle Rate} &
-    {\itemizationHeaderStyle Amount}
+    {\itemizationHeaderStyle Starttermin} &
+    {\itemizationHeaderStyle Beschreibung} &
+    \multicolumn{2}{l}{\itemizationHeaderStyle Menge} &
+    {\itemizationHeaderStyle Einzelpreis} &
+    {\itemizationHeaderStyle Gesamtpreis}
     \\
     \noalign{\smallskip}
     \hline
@@ -184,7 +158,7 @@
 
 \newcommand*{\calcamount}[2]{%
     \FPmul\t{#1}{#2}%
-    \formatcurrency{\t}%
+    \num{\t}%
 %
     \FPadd\gt{\InvoiceTotal}{\t}%
     \global\let\InvoiceTotal\gt%
@@ -222,22 +196,8 @@
     \end{minipage} &
     {\itemizationRowStyle \@formatHoursLeft{#2}} &
     {\itemizationRowStyle \@formatHoursRight{#2}} &
-    {\itemizationRowStyle \currencysym#3} &
-    {\itemizationRowStyle \currencysym\calcamount{#2}{#3}}
-    \\
-    \noalign{\medskip}
-}
-
-\newcommand{\lineitemp}[5]{
-    {\itemizationRowStyle #1} &
-    {\itemizationRowStyle #4} &
-    \begin{minipage}[t]{0.5\textwidth}
-        \begin{itemize}[leftmargin=0pt, labelsep=1pt, itemsep=0pt] \itemizationRowStyle #5 \end{itemize}
-    \end{minipage} &
-    {\itemizationRowStyle \@formatHoursLeft{#2}} &
-    {\itemizationRowStyle \@formatHoursRight{#2}} &
-    {\itemizationRowStyle \currencysym#3} &
-    {\itemizationRowStyle \currencysym\calcamount{#2}{#3}}
+    {\itemizationRowStyle \num{#3}\currencysym} &
+    {\itemizationRowStyle \calcamount{#2}{#3}\currencysym}
     \\
     \noalign{\medskip}
 }
@@ -259,10 +219,6 @@
     \tikz[overlay,remember picture] {
         \draw[->,thick,color=subduedColor] ($(@p1)+(0.75em,1.5ex)$) -| ($(@p2)+(-2em,0.7ex)$) -- ($(@p2)+(-0.5em,0.7ex)$);
     }
-}
-
-\newcommand*{\formatcurrency}[1]{%
-    \num[group-separator={,}, group-minimum-digits=3, round-mode=places, round-precision=2]{#1}%
 }
 
 % Implementation by Werner (http://tex.stackexchange.com/a/176815/35707)
